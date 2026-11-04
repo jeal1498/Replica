@@ -1,0 +1,19 @@
+{
+  "_about": "Temas en español para apps de rentabilidad de conductores.",
+  "request_patterns": ["deber[ií]an? (de )?(poner|agregar|tener)", "le vendr[ií]a (muy )?bien", "ser[ií]a (bueno|bien|genial)", "como recomendaci[oó]n", "falta(ría)?", "ojal[aá]", "por qu[eé] no pone"],
+  "themes": [
+    {"id":"no_lee","label":"Deja de leer / no aparece el aviso","kind":"complaint","patterns":["no lee","dej[oó] de leer","no (me )?aparece","no lanza","no manda","no hace nada","no funciona","no aparece el cartel","no sirve"]},
+    {"id":"se_apaga","label":"Se apaga, se reinicia o se cuelga","kind":"complaint","patterns":["se apaga","se reinicia","cuelga","solo funciona un rato","parpa?rea","lento"]},
+    {"id":"actualizaciones","label":"Se rompe con cada actualización","kind":"complaint","patterns":["actualizaci[oó]n"]},
+    {"id":"calculo","label":"Cálculos incorrectos","kind":"complaint","patterns":["incorrect","mal el peso","resultados de 0","calcula (el|mal)","no (los )?calcula","informaci[oó]n incorrecta","me daba mal","solo calcula"]},
+    {"id":"soporte","label":"Soporte que no responde","kind":"complaint","patterns":["soporte","nunca respondi","no me resolvieron"]},
+    {"id":"cobro","label":"Pagué Premium y no sirve / no puedo cancelar","kind":"complaint","patterns":["pagu[eé]","premium","suscripci[oó]n","cancelar","engañaron"]},
+    {"id":"contador","label":"El contador de ganancias cuenta ofertas, no viajes","kind":"complaint","patterns":["notificaci[oó]n, no por viaje","contador de dinero"]},
+    {"id":"audio","label":"Interfiere con el audio o la música","kind":"complaint","patterns":["m[uú]sica","audio"]},
+    {"id":"indrive_pin","label":"No lee ofertas de precio propuesto (DiDi pin tu precio, inDrive)","kind":"request","patterns":["pin tu precio","indrive"]},
+    {"id":"pop_layout","label":"Pop-up: $/h y $/km más grandes que la neta","kind":"request","patterns":["m[aá]s grande","ganancia por hora"]},
+    {"id":"desconectar","label":"Botón para desconectarse de todas las apps","kind":"request","patterns":["desconectar"]},
+    {"id":"comunidad","label":"Grupo de WhatsApp y atención personalizada","kind":"praise","patterns":["whatsapp","atenci[oó]n personalizada"]},
+    {"id":"ahorro","label":"Ahorra combustible, tiempo y sube ganancias","kind":"praise","patterns":["ahorro","ganancias","ganar m[aá]s","mejorar los ingresos","gastos operativos"]}
+  ]
+}

@@ -65,3 +65,11 @@ Minutos de espera fijos sumados al cálculo de $/h,semaforo,should,VP,no,las app
 Últimas 10 ofertas: ver ruta en el mapa y compartir con colegas,historial,should,VP,no,
 Leer ganancias del día desde captura de las apps,finanzas,should,VP,no,ingreso automático sin teclear
 Turnos con hora de inicio/fin y km del odómetro,jornada,could,VP,no,
+Guardián del lector: avisa si deja de leer o se cae el servicio,lector,must,no,no,fixes #1 · 13 reseñas
+Reporte de lectura mala en un toque por WhatsApp,lector,must,no,no,fixes #2
+Pruebas del parser con textos reales en CI,lector,must,no,no,fixes #3
+Cancelar suscripción en un toque,monetizacion,must,no,no,fixes #4 · 6 reseñas
+Mostrar en el pop-up lo que se leyó,semaforo,should,no,no,fixes #5
+Número grande elegible en el pop-up,semaforo,should,no,no,fixes #6
+La voz baja la música en vez de cortarla,semaforo,should,no,no,fixes #7
+DiDi Pin tu precio con contraoferta sugerida,lector,should,no,no,fixes #8
