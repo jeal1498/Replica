@@ -17,7 +17,18 @@ Mercado: conductores de Uber / DiDi / inDrive / Cabify en México (RU también C
 | Web RU | https://ruteo.neiderruiz.com · https://ruteo.dev/privacy | marketing, privacidad |
 | Ficha Play VI | https://play.google.com/store/apps/details?id=com.videvs.viajeinteligente | OCR vs accesibilidad, modo Eco/Turbo, turnos |
 | Web VI | https://viaje-inteligente-vi.blogspot.com | blog |
-| Capturas | `replica/screens/rr-*, ru-*, vi-*` | solo referencia, no se publican (gitignored) |
+| Ficha Play GP (GananciasPro, EmaAguiDev, 1 mil+, Argentina) | https://play.google.com/store/apps/details?id=com.gananciaspro.app · https://gananciaspro.netlify.app | OCR + overlay mínimo, un criterio $/km o $/h, ES/EN |
+| Ficha Play VR (Viaje Rentable, Netche, 1 mil+, 60 reseñas, Argentina) | https://play.google.com/store/apps/details?id=com.viajerentable.app · https://viajerentable.com.ar | el más completo: 6 plataformas, contraoferta inDrive, zonas a evitar, varios vehículos, freemium con anuncios |
+| Capturas | `replica/screens/rr-*, ru-*, vi-*, gp-*, vr-*` | solo referencia, no se publican (gitignored) |
+
+## Hallazgos de GP y VR (4 nov)
+
+- **VR es el rival más fuerte en funciones**: Uber, DiDi (incluido el Centro de viajes «1 de 3»), inDrive (te dice **cuánto contraofertar** para llegar a verde), Cabify, Rappi y Envíos Extra, con varias paradas.
+- **Freemium con anuncios**: gratis = una métrica a la vez + historial. Premium = las dos métricas, sin anuncios, varios vehículos, seguro y renta del auto en el costo, **zonas a evitar (incluidas las de la comunidad)**, filtros de recogida, duración y calificación, tarjeta personalizable, combustible actualizado y exportar a CSV o imagen. Plan mensual o **Días Premium sueltos**, más referidos.
+- VR comparte **datos anónimos de ofertas** (precio, distancias, zona) para el combustible y las zonas de la comunidad.
+- VR ahora agrega un **«Modo conducción»** (su propia plataforma de viajes). Está fuera del alcance.
+- **GP es mínimo**: solo OCR y un criterio. Su burbuja dice cuánto falta para el mínimo («$577/km por debajo de tu mínimo»).
+- Las dos están en Argentina (voseo, ARS); México no es su foco.
 
 Pendiente (valor alto): videos de YouTube/TikTok de uso real; reseñas negativas → `/replica-entrepreneur`.
 

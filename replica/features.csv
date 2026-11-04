@@ -45,3 +45,17 @@ Dónde estacioné,extras,skip,RR,no,fuera de alcance fase 1
 Referidos con XP,crecimiento,skip,RU,no,fuera de alcance fase 1
 Aceptar/rechazar automáticamente,semaforo,skip,,no,nunca: viola términos y políticas de Play
 API oficial de Uber/DiDi,lector,skip,,no,no existe pública para conductores
+Parser Rappi / entregas,lector,could,VR,no,delivery con varias paradas
+DiDi Centro de viajes (lista de ofertas),lector,should,VR,no,tarjeta que sigue la oferta 1 de 3
+Sugerir contraoferta en inDrive para llegar a verde,semaforo,should,VR,no,diferenciador fuerte
+Mostrar cuánto falta para el mínimo,semaforo,should,GP,no,ej. $577/km por debajo
+Opción de excluir la recogida del cálculo,semaforo,could,VR,no,
+Varios vehículos con costos y umbrales propios,ajustes,could,VR,no,
+Seguro y renta del auto en el costo real,ajustes,should,VR,no,conductores que rentan
+Precio de combustible automático por país,ajustes,could,VR,no,necesita fuente de datos
+Detección automática de país y moneda,onboarding,should,VR,no,
+Zonas a evitar en el mapa,semaforo,could,VR,no,comunidad = datos compartidos
+Tarjeta flotante personalizable,semaforo,could,VR,no,
+Exportar historial a imagen,historial,could,VR,no,
+Días Premium sueltos,monetizacion,could,VR,no,alternativa al plan mensual
+Modo conducción (plataforma propia),extras,skip,VR,no,otro negocio
