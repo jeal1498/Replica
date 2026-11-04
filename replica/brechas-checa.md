@@ -1,6 +1,6 @@
 # Checa (v10.0) contra la competencia
 
-Rivales: RR Ruta Rentable (100 mil+), RU Ruteo (10 mil+), VI Viaje Inteligente, GP GananciasPro, **VR Viaje Rentable** (el más completo en funciones).
+Rivales: RR Ruta Rentable (100 mil+), RU Ruteo (10 mil+), VI Viaje Inteligente, GP GananciasPro, **VR Viaje Rentable** (el más completo en funciones), VP Viaje Pro.
 Fuentes: `jeal1498/APK-CHECA` (main, d252aea), `replica/recon.md`, `replica/features.csv`.
 
 ## Checa ya lo tiene (o mejor)
@@ -27,3 +27,7 @@ Fuentes: `jeal1498/APK-CHECA` (main, d252aea), `replica/recon.md`, `replica/feat
 | could | Cabify, Rappi y entregas con varias paradas | RR, VR |
 | could | Varios vehículos, zonas a evitar, exportar a CSV/imagen | VR |
 | could | Días Premium sueltos además del plan | VR |
+| should | Minutos de espera sumados al $/h | VP |
+| should | Registrar ganancias del día leyendo la captura de Uber o DiDi | VP |
+| could | Últimas ofertas con ruta en mapa para compartir con colegas | VP |
+| could | Elegir qué datos muestra el pop-up | VP, VR |

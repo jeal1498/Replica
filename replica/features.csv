@@ -59,3 +59,9 @@ Tarjeta flotante personalizable,semaforo,could,VR,no,
 Exportar historial a imagen,historial,could,VR,no,
 Días Premium sueltos,monetizacion,could,VR,no,alternativa al plan mensual
 Modo conducción (plataforma propia),extras,skip,VR,no,otro negocio
+Elegir qué datos muestra la tarjeta flotante,semaforo,could,VP VR,no,
+Color de fondo según la dinámica (1.1x… 1.9x),semaforo,could,VP,no,
+Minutos de espera fijos sumados al cálculo de $/h,semaforo,should,VP,no,las apps no cuentan la espera
+Últimas 10 ofertas: ver ruta en el mapa y compartir con colegas,historial,should,VP,no,
+Leer ganancias del día desde captura de las apps,finanzas,should,VP,no,ingreso automático sin teclear
+Turnos con hora de inicio/fin y km del odómetro,jornada,could,VP,no,

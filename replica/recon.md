@@ -19,7 +19,8 @@ Mercado: conductores de Uber / DiDi / inDrive / Cabify en México (RU también C
 | Web VI | https://viaje-inteligente-vi.blogspot.com | blog |
 | Ficha Play GP (GananciasPro, EmaAguiDev, 1 mil+, Argentina) | https://play.google.com/store/apps/details?id=com.gananciaspro.app · https://gananciaspro.netlify.app | OCR + overlay mínimo, un criterio $/km o $/h, ES/EN |
 | Ficha Play VR (Viaje Rentable, Netche, 1 mil+, 60 reseñas, Argentina) | https://play.google.com/store/apps/details?id=com.viajerentable.app · https://viajerentable.com.ar | el más completo: 6 plataformas, contraoferta inDrive, zonas a evitar, varios vehículos, freemium con anuncios |
-| Capturas | `replica/screens/rr-*, ru-*, vi-*, gp-*, vr-*` | solo referencia, no se publican (gitignored) |
+| Ficha Play VP (Viaje Pro, 500+, Argentina y Brasil) | https://play.google.com/store/apps/details?id=com.eduardo.viajepro · https://sites.google.com/view/viajepro | OCR + overlay configurable, turnos, ingresos leídos de capturas |
+| Capturas | `replica/screens/rr-*, ru-*, vi-*, gp-*, vr-*, vp-*` | solo referencia, no se publican (gitignored) |
 
 ## Hallazgos de GP y VR (4 nov)
 
@@ -28,7 +29,8 @@ Mercado: conductores de Uber / DiDi / inDrive / Cabify en México (RU también C
 - VR comparte **datos anónimos de ofertas** (precio, distancias, zona) para el combustible y las zonas de la comunidad.
 - VR ahora agrega un **«Modo conducción»** (su propia plataforma de viajes). Está fuera del alcance.
 - **GP es mínimo**: solo OCR y un criterio. Su burbuja dice cuánto falta para el mínimo («$577/km por debajo de tu mínimo»).
-- Las dos están en Argentina (voseo, ARS); México no es su foco.
+- **VP (Viaje Pro)**: tarjeta configurable (eliges qué datos ver), fondo de color según la dinámica, minutos de espera sumados al $/h, últimas 10 ofertas con ruta en mapa para compartir, turnos con km del odómetro y **ganancias del día leídas desde capturas** de hasta 3 apps. Totales por semana, mes y año con reporte para compartir. En español y portugués.
+- GP, VR y VP están en Argentina (voseo, ARS); México no es su foco.
 
 Pendiente (valor alto): videos de YouTube/TikTok de uso real; reseñas negativas → `/replica-entrepreneur`.
 
