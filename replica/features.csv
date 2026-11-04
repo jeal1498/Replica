@@ -1,0 +1,47 @@
+feature,area,priority,original,clone,notes
+Onboarding con aviso de no afiliación,onboarding,must,RR RU VI,no,
+Configurar país moneda y vehículo,onboarding,must,RR,no,MXN por defecto
+Pantalla de permisos con estado,onboarding,must,RR RU VI,no,overlay accesibilidad notificaciones batería
+Guía de batería por fabricante,onboarding,should,RU,no,Xiaomi Huawei Oppo
+Lectura de ofertas por accesibilidad,lector,must,RR RU VI,no,AccessibilityService; procesamiento local
+Lectura de ofertas por captura + OCR local,lector,should,VI RR,no,MediaProjection + ML Kit; alternativa si Play rechaza accesibilidad
+Parser Uber,lector,must,RR RU VI,no,
+Parser DiDi,lector,must,RR RU VI,no,
+Parser inDrive,lector,should,VI,no,ofertas con contraoferta
+Parser Cabify,lector,could,RR,no,
+Modo Eco / Turbo de lectura,lector,could,VI,no,ahorro de batería
+Burbuja flotante con monto $/km $/h km min pickup,semaforo,must,RR RU VI,no,aparece y se va sola
+Semáforo verde/amarillo/rojo,semaforo,must,RR RU VI,no,amarillo = faltan datos
+Descontar comisión de la plataforma,semaforo,must,RU,no,ganancia neta por km
+Costo operativo por km (gasolina),semaforo,should,RR,no,
+Mostrar rating del pasajero,semaforo,should,RU,no,
+Motivo del rechazo en la burbuja,semaforo,should,RU,no,"ej. pickup > 2 km"
+Filtros: mín por km mín por hora pickup máx tiempo máx,filtros,must,RR RU VI,no,
+Rating mínimo de pasajero,filtros,could,RU,no,
+Perfiles por turno Día/Tarde/Noche,filtros,should,VI,no,
+Iniciar / terminar jornada con cronómetro,jornada,must,RU VI,no,
+Resumen de jornada,jornada,should,RU,no,horas km viajes neto $/h
+Historial de ofertas analizadas,historial,must,RR RU,no,
+Aceptadas vs rechazadas,historial,should,RU,no,
+Dashboard: neta hoy viajes horas $/h,finanzas,must,RU,no,
+Registrar ingreso por plataforma,finanzas,must,RU,no,
+Registrar gasto en 2 toques con categorías,finanzas,must,RU,no,Vehículo / Personal
+Meta diaria por día de semana + aviso al cumplir,finanzas,should,RU,no,
+Estadísticas día/semana/mes (barras),estadisticas,must,RR RU,no,
+Donut por plataforma y por categoría de gasto,estadisticas,should,RR RU,no,
+Distribución del tiempo (en viaje/yendo/esperando),estadisticas,could,RU,no,
+Actividad por hora del día,estadisticas,could,RU,no,
+Tasa de aceptación,estadisticas,should,RU,no,
+Modo oscuro,ajustes,must,RR VI,no,por defecto oscuro
+Soporte por WhatsApp,ajustes,should,RR,no,
+Suscripción Premium con Play Billing,monetizacion,must,RR RU VI,no,
+Límite gratuito de análisis,monetizacion,should,RR,no,límite exacto desconocido
+Prueba gratis,monetizacion,should,RR,no,
+Login Google + respaldo de datos,cuenta,could,RU,no,datos de ofertas siguen locales
+Exportar a CSV,finanzas,could,,no,no visto en las originales; idea
+SOS / contactos de emergencia,seguridad,skip,RU,no,fuera de alcance fase 1
+Cámara secreta,seguridad,skip,RR,no,fuera de alcance fase 1
+Dónde estacioné,extras,skip,RR,no,fuera de alcance fase 1
+Referidos con XP,crecimiento,skip,RU,no,fuera de alcance fase 1
+Aceptar/rechazar automáticamente,semaforo,skip,,no,nunca: viola términos y políticas de Play
+API oficial de Uber/DiDi,lector,skip,,no,no existe pública para conductores
