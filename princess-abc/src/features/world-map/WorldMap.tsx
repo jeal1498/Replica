@@ -54,7 +54,7 @@ export function WorldMap({ onBack, onPlay }: { onBack: () => void; onPlay: (lett
                     {w.letters.map((l) => {
                       const st = lessonState(g.lessons, l);
                       const stars = g.lessons[l]?.stars ?? 0;
-                      const base = 'btn-press relative flex h-[76px] w-[76px] items-center justify-center rounded-full border-4 border-white font-display text-4xl font-extrabold';
+                      const base = 'btn-press relative flex h-[4.75rem] w-[4.75rem] items-center justify-center rounded-full border-4 border-white font-display text-4xl font-extrabold';
                       const style = st === 'completed' ? 'bg-aqua-400 text-white shadow-[0_6px_0_#0f8b80]'
                         : st === 'available' ? 'bg-gold-300 text-ink shadow-[0_6px_0_#a67900] pulse-hint'
                         : st === 'pending' ? 'bg-white text-lilac-500 shadow-[0_6px_0_#d8b4fe]' : 'bg-slate-200 text-slate-400 shadow-[0_6px_0_#94a3b8]';

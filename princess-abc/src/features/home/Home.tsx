@@ -34,10 +34,10 @@ export function Home({ go }: { go: (s: 'continue' | 'map' | 'rewards' | 'parent'
           <RoundButton label="Grown-ups" tone="white" onClick={() => go('parent')}><Icon name="grownup" className="h-7 w-7" /></RoundButton>
         </div>
       </div>
-      <div className="flex min-h-0 flex-1 flex-col items-center gap-2 overflow-y-auto px-4 pb-4">
-        <div className="scale-75 sm:scale-90"><Logo /></div>
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-evenly gap-2 overflow-y-auto px-4 pb-4">
+        <div className="-my-4 scale-75"><Logo /></div>
         <div className="flex items-end gap-1">
-          <Princess mood="happy" pose="wave" className="h-[min(30vh,280px)] w-[min(30vw,200px)]" />
+          <Princess mood="happy" pose="wave" className="h-[min(27vh,20rem)] w-[min(20.5vh,15rem)]" />
           <Bubble className="mb-14 max-w-[10rem] !text-lg">{msg}</Bubble>
         </div>
         <BigButton tone="pink" className="min-h-[84px] w-full max-w-sm text-3xl pulse-hint" onClick={() => go('continue')} icon={<Icon name="play" className="h-9 w-9" />}>CONTINUE</BigButton>
