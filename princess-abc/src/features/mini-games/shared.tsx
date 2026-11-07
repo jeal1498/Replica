@@ -47,7 +47,7 @@ export function GameShell({ type, round, total, message, mood = 'happy', pose = 
         </div>
       </div>
       <div className="flex items-end gap-1 px-3 pt-1">
-        <Princess mood={mood} pose={pose} className="h-36 w-24 shrink-0 sm:h-44 sm:w-28" />
+        <Princess mood={mood} pose={pose} className="h-[19vh] w-[14.5vh] shrink-0" />
         <div className="mb-8 flex flex-1 items-center gap-2">
           <Bubble className="flex-1">{message}</Bubble>
           <RoundButton label="Listen again" tone="aqua" onClick={onReplay}><Icon name="speaker" className="h-8 w-8" /></RoundButton>

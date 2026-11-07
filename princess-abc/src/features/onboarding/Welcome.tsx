@@ -35,7 +35,7 @@ export function Welcome({ onStart }: { onStart: () => void }) {
       <div className="flex flex-1 flex-col items-center justify-around px-4 py-6">
         <Logo />
         <div className="flex items-end gap-2">
-          <Princess mood="cheer" pose="wave" className="h-[min(42vh,380px)] w-[min(40vw,280px)]" />
+          <Princess mood="cheer" pose="wave" className="h-[min(42vh,26rem)] w-[min(50vw,19rem)]" />
           <Bubble className="mb-24 max-w-[11rem]">Hello! Let's learn the ABC!</Bubble>
         </div>
         <BigButton tone="pink" className="min-h-[84px] px-12 text-3xl pulse-hint" onClick={start} icon={<Icon name="play" className="h-9 w-9" />}>START ADVENTURE</BigButton>
