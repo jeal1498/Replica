@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kinder Spelling Bee - Visual & Spelling Practice</title>
+    
+    <!-- PWA Primary Color & Meta -->
+    <meta name="theme-color" content="#4ECDC4">
+    <meta name="description" content="Spelling Bee practice app designed specifically for 4-year-old Kinder students. Flashcard reading + Letter-by-letter spelling in English.">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Kinder Bee">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐝</text></svg>">
+
+    <link id="manifest-placeholder" rel="manifest">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            coral: '#FF6B6B',
+                            teal: '#4ECDC4',
+                            yellow: '#FFE66D',
+                            purple: '#A29BFE',
+                            blue: '#74B9FF',
+                            green: '#55E6C1'
+                        }
+                    },
+                    fontFamily: {
+                        fredoka: ['Fredoka', 'Chalkboard SE', 'Comic Sans MS', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom Typography & CSS Animations -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
+        
+        * {
+            font-family: 'Fredoka', 'Comic Sans MS', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        body {
+            background: linear-gradient(135deg, #E0F7FA 0%, #FFF9C4 50%, #FCE4EC 100%);
+        }
+
+        .bubble-btn {
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 6px 0 rgba(0,0,0,0.15);
+        }
+
+        .bubble-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 rgba(0,0,0,0.15);
+        }
+
+        .pop-in {
+            animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.6); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            border: 4px solid rgba(255, 255, 255, 0.7);
+        }
+
+        /* Hide scrollbars */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex flex-col justify-between p-3 md:p-6 text-slate-800">
+
+    <!-- CANVAS FOR CONFETTI ANIMATION -->
+    <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+    <!-- TOP NAV BAR -->
+    <header class="w-full max-w-4xl mx-auto flex justify-between items-center bg-white/90 rounded-3xl p-2.5 sm:p-3 shadow-lg border-2 border-teal-200 z-10">
+        <!-- Word Bank / Grid Selector -->
+        <button onclick="showWordGrid()" class="bubble-btn bg-brand-yellow text-amber-950 font-bold px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-2xl flex items-center gap-2 text-base sm:text-lg border-2 border-amber-300">
+            <span>📚</span>
+            <span>Words</span>
+        </button>
+
+        <!-- Current Word Indicator & Filter Level -->
+        <div class="flex items-center gap-2">
+            <span id="progress-tag" class="bg-brand-teal text-white px-3.5 py-1 rounded-full text-sm sm:text-base font-black shadow">
+                Word 1 / 96
+            </span>
+        </div>
+
+        <!-- Help Mode Toggle & Star Counter -->
+        <div class="flex items-center gap-2">
+            <!-- Hint/Guide Toggle Button -->
+            <button id="btn-toggle-hint" onclick="toggleHintMode()" class="bubble-btn bg-amber-100 text-amber-900 border-2 border-amber-300 px-3 py-1.5 sm:px-4 sm:py-2 rounded-2xl font-bold text-xs sm:text-sm flex items-center gap-1.5">
+                <span>💡</span>
+                <span id="hint-btn-label">Guide: ON</span>
+            </button>
+
+            <!-- Star Counter -->
+            <div class="flex items-center bg-amber-50 px-3 py-1.5 rounded-2xl border border-amber-200">
+                <span class="text-xl sm:text-2xl mr-1">⭐</span>
+                <span id="star-count" class="text-lg sm:text-xl font-black text-amber-600">0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN INTERACTIVE FLASHCARD & SPELLING AREA -->
+    <main class="w-full max-w-3xl mx-auto flex-1 flex flex-col justify-around items-center my-2 sm:my-3 z-10">
+        
+        <!-- Flashcard Box: Image + Big Printable Word ("Look & Read") -->
+        <div class="glass-card w-full rounded-3xl p-4 sm:p-5 text-center shadow-xl flex flex-col items-center justify-center relative">
+            
+            <!-- Repeat Audio Button -->
+            <button onclick="speakCurrentWord()" class="bubble-btn absolute top-3 right-3 bg-brand-coral text-white p-3 rounded-full shadow-lg hover:scale-105 transition" title="Listen to full word">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>
+                </svg>
+            </button>
+
+            <!-- Word Number Label -->
+            <div class="text-xs font-extrabold text-teal-600 tracking-widest uppercase bg-teal-100 px-3 py-0.5 rounded-full mb-1">
+                Word #<span id="word-id-num">1</span>
+            </div>
+
+            <!-- Visual Emoji / Illustration -->
+            <div id="word-emoji" onclick="speakCurrentWord()" class="text-6xl sm:text-8xl cursor-pointer hover:scale-105 transition duration-300 filter drop-shadow-md pop-in my-1">
+                🐜
+            </div>
+
+            <!-- Big Word Display (School Format: Look and Read first!) -->
+            <div id="school-word-display" onclick="speakCurrentWord()" class="text-4xl sm:text-6xl font-black text-slate-800 uppercase tracking-wider cursor-pointer hover:text-brand-coral transition mt-1">
+                ANT
+            </div>
+        </div>
+
+        <!-- Target Spelling Slots -->
+        <div id="slots-container" class="flex flex-wrap justify-center gap-2 sm:gap-3 my-2 sm:my-3">
+            <!-- Slots dynamically rendered -->
+        </div>
+
+        <!-- VOICE INPUT CONTROL (BIG MIC BUTTON) -->
+        <div class="w-full flex flex-col items-center gap-2 my-1">
+            <button id="mic-btn" onclick="toggleVoiceRecognition()" class="bubble-btn bg-emerald-500 hover:bg-emerald-600 text-white font-black px-6 py-3 sm:px-8 sm:py-4 rounded-3xl shadow-xl flex items-center gap-3 text-lg sm:text-2xl border-b-4 border-emerald-700 transition">
+                <span id="mic-icon" class="text-2xl sm:text-4xl">🎙️</span>
+                <span id="mic-text">TAP TO SPELL BY VOICE</span>
+            </button>
+
+            <!-- Real-time Speech Status Feedback -->
+            <div id="voice-status" class="h-auto min-h-[24px] text-sm sm:text-base font-bold text-teal-700 animate-pulse text-center px-4">
+                Tap microphone to spell by voice!
+            </div>
+        </div>
+
+        <!-- Keyboard Toggle / Touch Keyboard -->
+        <div class="w-full max-w-2xl px-1">
+            <div id="keyboard-container" class="flex flex-wrap justify-center gap-2 sm:gap-3 bg-white/70 p-3 sm:p-4 rounded-3xl shadow-inner border border-white">
+                <!-- Touch Keys rendered dynamically -->
+            </div>
+        </div>
+
+        <!-- Navigation & Action Buttons -->
+        <div class="flex gap-3 sm:gap-4 w-full justify-center mt-1">
+            <button onclick="clearInputs()" class="bubble-btn bg-gray-200 text-gray-700 font-bold px-4 py-2.5 rounded-2xl flex items-center gap-1 text-base border border-gray-300">
+                🔄 Clear
+            </button>
+            <button onclick="prevWord()" class="bubble-btn bg-brand-purple text-white font-bold px-5 py-2.5 rounded-2xl text-base sm:text-lg">
+                ⬅️ Prev
+            </button>
+            <button onclick="nextWord()" class="bubble-btn bg-brand-blue text-white font-bold px-5 py-2.5 rounded-2xl text-base sm:text-lg">
+                Next ➡️
+            </button>
+        </div>
+    </main>
+
+    <!-- WORD BANK GRID MODAL -->
+    <div id="grid-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 hidden flex-col p-3 sm:p-6">
+        <!-- Modal Header -->
+        <div class="max-w-4xl mx-auto w-full flex justify-between items-center mb-3 text-white">
+            <h2 class="text-2xl sm:text-3xl font-black flex items-center gap-2">
+                <span>🐝</span> Kinder Word List (1-96)
+            </h2>
+            <button onclick="hideWordGrid()" class="bubble-btn bg-brand-coral text-white text-xl font-bold rounded-full w-10 h-10 flex items-center justify-center">
+                ✕
+            </button>
+        </div>
+
+        <!-- Difficulty Level Filters -->
+        <div class="max-w-4xl mx-auto w-full flex flex-wrap gap-2 mb-3 justify-center">
+            <button onclick="setFilter('all')" class="filter-btn bg-brand-yellow text-amber-950 px-3.5 py-1.5 rounded-xl font-bold text-sm shadow">
+                All Words (1-96)
+            </button>
+            <button onclick="setFilter('easy')" class="filter-btn bg-brand-green text-emerald-950 px-3.5 py-1.5 rounded-xl font-bold text-sm shadow">
+                Easy (2-3 Letters)
+            </button>
+            <button onclick="setFilter('medium')" class="filter-btn bg-brand-blue text-sky-950 px-3.5 py-1.5 rounded-xl font-bold text-sm shadow">
+                Medium (4 Letters)
+            </button>
+            <button onclick="setFilter('hard')" class="filter-btn bg-brand-purple text-purple-950 px-3.5 py-1.5 rounded-xl font-bold text-sm shadow">
+                Advanced (5+ Letters)
+            </button>
+        </div>
+
+        <!-- Scrollable Grid of 96 Words -->
+        <div class="max-w-4xl mx-auto w-full flex-1 overflow-y-auto bg-white/90 rounded-3xl p-3 sm:p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 shadow-inner">
+            <div id="word-list-grid" class="contents"></div>
+        </div>
+    </div>
+
+    <!-- CELEBRATION / WIN MODAL -->
+    <div id="win-modal" class="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-50 hidden flex flex-col justify-center items-center p-4">
+        <div class="glass-card bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center shadow-2xl pop-in flex flex-col items-center border-4 border-yellow-300">
+            <div class="text-7xl sm:text-8xl mb-2 animate-bounce">🌟</div>
+            <h2 class="text-3xl font-black text-amber-500 mb-1">SUPER STAR!</h2>
+            <p class="text-lg text-gray-700 font-bold mb-4">You spelled <span id="win-word-name" class="text-brand-coral uppercase font-black">ANT</span> correctly!</p>
+            <button onclick="continueAfterWin()" class="bubble-btn w-full bg-brand-teal text-white text-xl font-black py-3.5 rounded-2xl shadow-lg border-b-4 border-teal-700">
+                NEXT WORD 🚀
+            </button>
+        </div>
+    </div>
+
+    <!-- APP LOGIC & SPEECH SYNTHESIS ENGINE -->
+    <script>
+        /* ----------------------------------------------------
+           1. COMPLETE 96 KINDER WORDS DATASET FROM THE SCHOOL LIST
+           ---------------------------------------------------- */
+        const WORDS_DATA = [
+            { id: 1, word: "ant", emoji: "🐜" },
+            { id: 2, word: "bat", emoji: "🦇" },
+            { id: 3, word: "bell", emoji: "🔔" },
+            { id: 4, word: "can", emoji: "🥫" },
+            { id: 5, word: "bus", emoji: "🚌" },
+            { id: 6, word: "bee", emoji: "🐝" },
+            { id: 7, word: "cat", emoji: "🐱" },
+            { id: 8, word: "sun", emoji: "☀️" },
+            { id: 9, word: "car", emoji: "🚗" },
+            { id: 10, word: "door", emoji: "🚪" },
+            { id: 11, word: "duck", emoji: "🦆" },
+            { id: 12, word: "boat", emoji: "⛵" },
+            { id: 13, word: "dog", emoji: "🐶" },
+            { id: 14, word: "eat", emoji: "🍽️" },
+            { id: 15, word: "egg", emoji: "🥚" },
+            { id: 16, word: "bib", emoji: "👶" },
+            { id: 17, word: "fin", emoji: "🦈" },
+            { id: 18, word: "ham", emoji: "🍖" },
+            { id: 19, word: "ink", emoji: "✒️" },
+            { id: 20, word: "pan", emoji: "🍳" },
+            { id: 21, word: "jet", emoji: "✈️" },
+            { id: 22, word: "jar", emoji: "🫙" },
+            { id: 23, word: "key", emoji: "🔑" },
+            { id: 24, word: "girl", emoji: "👧" },
+            { id: 25, word: "leg", emoji: "🦵" },
+            { id: 26, word: "lion", emoji: "🦁" },
+            { id: 27, word: "rat", emoji: "🐀" },
+            { id: 28, word: "cap", emoji: "🧢" },
+            { id: 29, word: "mat", emoji: "🧘" },
+            { id: 30, word: "hat", emoji: "🎩" },
+            { id: 31, word: "bag", emoji: "🎒" },
+            { id: 32, word: "fox", emoji: "🦊" },
+            { id: 33, word: "moon", emoji: "🌙" },
+            { id: 34, word: "man", emoji: "👨" },
+            { id: 35, word: "mop", emoji: "🧹" },
+            { id: 36, word: "fan", emoji: "🪭" },
+            { id: 37, word: "nest", emoji: "🪹" },
+            { id: 38, word: "ox", emoji: "🐂" },
+            { id: 39, word: "star", emoji: "⭐" },
+            { id: 40, word: "pin", emoji: "📌" },
+            { id: 41, word: "doll", emoji: "🪆" },
+            { id: 42, word: "boy", emoji: "👦" },
+            { id: 43, word: "box", emoji: "📦" },
+            { id: 44, word: "king", emoji: "👑" },
+            { id: 45, word: "kite", emoji: "🪁" },
+            { id: 46, word: "school", emoji: "🏫" },
+            { id: 47, word: "lunch", emoji: "🍱" },
+            { id: 48, word: "table", emoji: "🪵" },
+            { id: 49, word: "board", emoji: "📋" },
+            { id: 50, word: "fall", emoji: "🍂" },
+            { id: 51, word: "lamb", emoji: "🐑" },
+            { id: 52, word: "blue", emoji: "🟦" },
+            { id: 53, word: "teacher", emoji: "👩‍🏫" },
+            { id: 54, word: "clap", emoji: "👏" },
+            { id: 55, word: "tall", emoji: "🦒" },
+            { id: 56, word: "love", emoji: "❤️" },
+            { id: 57, word: "desk", emoji: "🖥️" },
+            { id: 58, word: "jump", emoji: "🦘" },
+            { id: 59, word: "short", emoji: "📏" },
+            { id: 60, word: "rice", emoji: "🍚" },
+            { id: 61, word: "paint", emoji: "🎨" },
+            { id: 62, word: "small", emoji: "🐣" },
+            { id: 63, word: "house", emoji: "🏠" },
+            { id: 64, word: "mouth", emoji: "👄" },
+            { id: 65, word: "smile", emoji: "😊" },
+            { id: 66, word: "big", emoji: "🐘" },
+            { id: 67, word: "kitten", emoji: "🐱" },
+            { id: 68, word: "park", emoji: "🛝" },
+            { id: 69, word: "out", emoji: "🚪" },
+            { id: 70, word: "apple", emoji: "🍎" },
+            { id: 71, word: "cake", emoji: "🎂" },
+            { id: 72, word: "boot", emoji: "👢" },
+            { id: 73, word: "feet", emoji: "🦶" },
+            { id: 74, word: "ax", emoji: "🪓" },
+            { id: 75, word: "pink", emoji: "🪷" },
+            { id: 76, word: "play", emoji: "🎮" },
+            { id: 77, word: "knee", emoji: "🦵" },
+            { id: 78, word: "arrow", emoji: "🏹" },
+            { id: 79, word: "rain", emoji: "🌧️" },
+            { id: 80, word: "wind", emoji: "🌬️" },
+            { id: 81, word: "neck", emoji: "🦒" },
+            { id: 82, word: "button", emoji: "🔘" },
+            { id: 83, word: "baby", emoji: "👶" },
+            { id: 84, word: "body", emoji: "🧍" },
+            { id: 85, word: "black", emoji: "⬛" },
+            { id: 86, word: "book", emoji: "📚" },
+            { id: 87, word: "green", emoji: "🟩" },
+            { id: 88, word: "sand", emoji: "🏖️" },
+            { id: 89, word: "white", emoji: "⬜" },
+            { id: 90, word: "sofa", emoji: "🛋️" },
+            { id: 91, word: "pig", emoji: "🐷" },
+            { id: 92, word: "bear", emoji: "🐻" },
+            { id: 93, word: "family", emoji: "👨‍👩‍👧‍👦" },
+            { id: 94, word: "lamp", emoji: "💡" },
+            { id: 95, word: "tree", emoji: "🌳" },
+            { id: 96, word: "zoo", emoji: "🎪" }
+        ];
+
+        /* ----------------------------------------------------
+           2. STATE VARIABLES
+           ---------------------------------------------------- */
+        let activeWordList = [...WORDS_DATA];
+        let currentIndex = 0;
+        let userInputs = [];
+        let score = 0;
+        let hintModeActive = true;
+        let audioCtx = null;
+        let recognition = null;
+        let isListening = false;
+
+        /* ----------------------------------------------------
+           3. PHONETIC LETTER MAPPER (Maps Speech Words to Single English Letters)
+           ---------------------------------------------------- */
+        const SPOKEN_LETTER_MAP = {
+            "a": "A", "ay": "A", "hay": "A",
+            "b": "B", "be": "B", "bee": "B", "bi": "B",
+            "c": "C", "see": "C", "sea": "C", "si": "C",
+            "d": "D", "dee": "D", "di": "D",
+            "e": "E", "ee": "E",
+            "f": "F", "ef": "F", "eff": "F",
+            "g": "G", "jee": "G", "ji": "G",
+            "h": "H", "aitch": "H", "h8": "H",
+            "i": "I", "eye": "I", "ai": "I",
+            "j": "J", "jay": "J",
+            "k": "K", "kay": "K",
+            "l": "L", "el": "L", "ell": "L",
+            "m": "M", "em": "M",
+            "n": "N", "en": "N", "and": "N",
+            "o": "O", "oh": "O", "ow": "O",
+            "p": "P", "pee": "P", "pi": "P",
+            "q": "Q", "cue": "Q", "queue": "Q",
+            "r": "R", "are": "R", "our": "R", "ar": "R",
+            "s": "S", "es": "S", "ess": "S",
+            "t": "T", "tea": "T", "tee": "T", "ti": "T",
+            "u": "U", "you": "U", "yew": "U",
+            "v": "V", "vee": "V", "vi": "V",
+            "w": "W", "double u": "W", "doubleyou": "W",
+            "x": "X", "ex": "X", "ecs": "X",
+            "y": "Y", "why": "Y", "wai": "Y",
+            "z": "Z", "zed": "Z", "zee": "Z"
+        };
+
+        /* ----------------------------------------------------
+           4. WEB SPEECH RECOGNITION SYSTEM (Dictation Engine - Mobile & Universal Fix)
+           ---------------------------------------------------- */
+        function initAudioEngine() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function speakText(text, pitch = 1.1) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85;
+                utterance.pitch = pitch;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function speakLetter(letter) {
+            speakText(letter, 1.2);
+        }
+
+        function speakCurrentWord() {
+            const currentItem = activeWordList[currentIndex];
+            if (currentItem) {
+                speakText(currentItem.word);
+            }
+        }
+
+        function playSound(type) {
+            initAudioEngine();
+            if (!audioCtx) return;
+
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'pop') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.08);
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.08);
+                } else if (type === 'error') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(150, audioCtx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.2);
+                }
+            } catch(e) {}
+        }
+
+        function initSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const statusElem = document.getElementById('voice-status');
+
+            if (!SpeechRecognition) {
+                statusElem.textContent = "⚠️ Speech Recognition is not supported on this browser/environment. Please use the letter buttons below.";
+                statusElem.classList.remove('animate-pulse');
+                statusElem.classList.add('text-rose-600');
+                document.getElementById('mic-btn').disabled = true;
+                return null;
+            }
+
+            // Check if context is insecure (Web Speech API requires HTTPS or localhost)
+            if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+                statusElem.textContent = "⚠️ Microphone requires HTTPS. If testing preview, open app in secure view.";
+            }
+
+            const rec = new SpeechRecognition();
+            rec.continuous = true;
+            rec.interimResults = true;
+            rec.lang = 'en-US';
+
+            rec.onstart = function() {
+                isListening = true;
+                updateMicUI(true);
+                statusElem.textContent = "🗣️ Listening! Speak letters clearly in English (e.g., 'A', 'B', 'C')";
+                statusElem.className = "h-auto min-h-[24px] text-sm sm:text-base font-bold text-emerald-600 animate-pulse text-center px-4";
+            };
+
+            rec.onresult = function(event) {
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    const transcript = event.results[i][0].transcript.toLowerCase().trim();
+                    processSpokenText(transcript);
+                }
+            };
+
+            rec.onerror = function(event) {
+                console.warn("Speech recognition event error:", event.error);
+                if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                    statusElem.textContent = "⚠️ Mic permission denied. Please allow microphone access in browser settings.";
+                    statusElem.className = "h-auto min-h-[24px] text-sm sm:text-base font-bold text-rose-600 text-center px-4";
+                    stopVoiceRecognition();
+                } else if (event.error === 'no-speech') {
+                    statusElem.textContent = "🗣️ Still listening... Say a letter!";
+                }
+            };
+
+            rec.onend = function() {
+                if (isListening) {
+                    try { 
+                        rec.start(); 
+                    } catch(e) {
+                        isListening = false;
+                        updateMicUI(false);
+                    }
+                } else {
+                    updateMicUI(false);
+                }
+            };
+
+            return rec;
+        }
+
+        function toggleVoiceRecognition() {
+            initAudioEngine();
+            
+            if (!recognition) {
+                recognition = initSpeechRecognition();
+            }
+            if (!recognition) return;
+
+            if (isListening) {
+                stopVoiceRecognition();
+            } else {
+                try {
+                    recognition.start();
+                } catch(e) {
+                    console.log("Mic restart fallback:", e);
+                    // Force re-init if instance got stale
+                    recognition = initSpeechRecognition();
+                    if (recognition) {
+                        try { recognition.start(); } catch(err) {}
+                    }
+                }
+            }
+        }
+
+        function stopVoiceRecognition() {
+            isListening = false;
+            if (recognition) {
+                try { recognition.stop(); } catch(e) {}
+            }
+            updateMicUI(false);
+            const statusElem = document.getElementById('voice-status');
+            statusElem.textContent = "Tap microphone to spell by voice!";
+            statusElem.className = "h-auto min-h-[24px] text-sm sm:text-base font-bold text-teal-700 text-center px-4";
+        }
+
+        function updateMicUI(listening) {
+            const btn = document.getElementById('mic-btn');
+            const icon = document.getElementById('mic-icon');
+            const text = document.getElementById('mic-text');
+
+            if (listening) {
+                btn.className = "bubble-btn bg-rose-500 hover:bg-rose-600 text-white font-black px-6 py-3 sm:px-8 sm:py-4 rounded-3xl shadow-xl flex items-center gap-3 text-lg sm:text-2xl border-b-4 border-rose-700 transition animate-pulse";
+                icon.textContent = "🎙️🔴";
+                text.textContent = "LISTENING... SAY LETTERS!";
+            } else {
+                btn.className = "bubble-btn bg-emerald-500 hover:bg-emerald-600 text-white font-black px-6 py-3 sm:px-8 sm:py-4 rounded-3xl shadow-xl flex items-center gap-3 text-lg sm:text-2xl border-b-4 border-emerald-700 transition";
+                icon.textContent = "🎙️";
+                text.textContent = "TAP TO SPELL BY VOICE";
+            }
+        }
+
+        function processSpokenText(phrase) {
+            const tokens = phrase.split(/\s+/);
+            
+            tokens.forEach(token => {
+                const cleanToken = token.replace(/[^a-z]/g, '');
+                if (!cleanToken) return;
+
+                let matchedLetter = SPOKEN_LETTER_MAP[cleanToken];
+                if (!matchedLetter && cleanToken.length === 1) {
+                    matchedLetter = cleanToken.toUpperCase();
+                }
+
+                if (matchedLetter) {
+                    const statusElem = document.getElementById('voice-status');
+                    statusElem.textContent = `Heard letter: "${matchedLetter}"!`;
+                    handleInputLetter(matchedLetter);
+                }
+            });
+        }
+
+        /* ----------------------------------------------------
+           5. GAME MECHANICS & DOM RENDERING (UPGRADED)
+           ---------------------------------------------------- */
+        function loadWord() {
+            const currentItem = activeWordList[currentIndex];
+            if (!currentItem) return;
+
+            userInputs = [];
+
+            // Update UI Top Headers
+            document.getElementById('word-emoji').textContent = currentItem.emoji;
+            document.getElementById('word-id-num').textContent = currentItem.id;
+            document.getElementById('school-word-display').textContent = currentItem.word.toUpperCase();
+            document.getElementById('progress-tag').textContent = `Word ${currentIndex + 1} / ${activeWordList.length}`;
+
+            // Render slots & key pad
+            renderSlots();
+            renderKeyboard();
+
+            // Pronounce word when flashcard opens
+            setTimeout(() => {
+                speakCurrentWord();
+            }, 300);
+        }
+
+        function renderSlots() {
+            const currentItem = activeWordList[currentIndex];
+            const targetWord = currentItem.word.toUpperCase();
+            const container = document.getElementById('slots-container');
+            container.innerHTML = '';
+
+            for (let i = 0; i < targetWord.length; i++) {
+                const slot = document.createElement('div');
+                const isFilled = i < userInputs.length;
+                const letter = isFilled ? userInputs[i] : '';
+
+                // If hint mode is ON, show ghost/dashed letter outline
+                const ghostChar = hintModeActive && !isFilled ? targetWord[i] : '';
+
+                slot.className = `w-12 h-14 sm:w-16 sm:h-20 rounded-2xl border-4 flex items-center justify-center text-2xl sm:text-4xl font-black shadow-sm transition-all ${
+                    isFilled 
+                    ? 'bg-amber-300 border-amber-500 text-amber-950 pop-in scale-105' 
+                    : hintModeActive
+                    ? 'bg-white/50 border-dashed border-amber-300 text-amber-300/60'
+                    : 'bg-white/80 border-dashed border-gray-300 text-transparent'
+                }`;
+                
+                slot.textContent = letter || ghostChar || '_';
+
+                if (isFilled && i === userInputs.length - 1) {
+                    slot.onclick = () => removeLastLetter();
+                }
+
+                container.appendChild(slot);
+            }
+        }
+
+        function renderKeyboard() {
+            const currentItem = activeWordList[currentIndex];
+            const targetLetters = currentItem.word.toUpperCase().split('');
+            const container = document.getElementById('keyboard-container');
+            container.innerHTML = '';
+
+            // Generate distractors + target letters
+            let letterPool = [...targetLetters];
+            const extraCount = Math.max(3, 8 - letterPool.length);
+            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+            for (let i = 0; i < extraCount; i++) {
+                const randomChar = alphabet[Math.floor(Math.random() * alphabet.length)];
+                letterPool.push(randomChar);
+            }
+
+            // Shuffle keys
+            letterPool.sort(() => Math.random() - 0.5);
+
+            const colors = [
+                'bg-rose-400 border-rose-600 text-white',
+                'bg-purple-400 border-purple-600 text-white',
+                'bg-sky-400 border-sky-600 text-white',
+                'bg-emerald-400 border-emerald-600 text-white',
+                'bg-amber-400 border-amber-600 text-amber-950',
+                'bg-orange-400 border-orange-600 text-white'
+            ];
+
+            letterPool.forEach((char, idx) => {
+                const btn = document.createElement('button');
+                const colorClass = colors[idx % colors.length];
+
+                btn.className = `bubble-btn ${colorClass} w-12 h-12 sm:w-16 sm:h-16 rounded-2xl text-2xl sm:text-3xl font-black border-b-4 flex items-center justify-center active:scale-95 transition`;
+                btn.textContent = char;
+                btn.onclick = () => handleInputLetter(char);
+
+                container.appendChild(btn);
+            });
+        }
+
+        function handleInputLetter(char) {
+            const currentItem = activeWordList[currentIndex];
+            const targetWord = currentItem.word.toUpperCase();
+
+            if (userInputs.length < targetWord.length) {
+                playSound('pop');
+                speakLetter(char); // Pronounce letter A, B, C...
+                userInputs.push(char);
+                renderSlots();
+
+                if (userInputs.length === targetWord.length) {
+                    checkAnswer();
+                }
+            }
+        }
+
+        function removeLastLetter() {
+            if (userInputs.length > 0) {
+                playSound('pop');
+                userInputs.pop();
+                renderSlots();
+            }
+        }
+
+        function clearInputs() {
+            playSound('pop');
+            userInputs = [];
+            renderSlots();
+        }
+
+        function toggleHintMode() {
+            playSound('pop');
+            hintModeActive = !hintModeActive;
+            const label = document.getElementById('hint-btn-label');
+            label.textContent = hintModeActive ? 'Guide: ON' : 'Guide: OFF';
+            renderSlots();
+        }
+
+        function checkAnswer() {
+            const currentItem = activeWordList[currentIndex];
+            const targetWord = currentItem.word.toUpperCase();
+            const enteredWord = userInputs.join('');
+
+            if (enteredWord === targetWord) {
+                // Stop listening temporarily on win
+                stopVoiceRecognition();
+
+                score += 10;
+                document.getElementById('star-count').textContent = score;
+
+                triggerCanvasConfetti();
+
+                setTimeout(() => {
+                    speakText(`Great spelling! ${currentItem.word}!`, 0.9);
+                    document.getElementById('win-word-name').textContent = currentItem.word;
+                    document.getElementById('win-modal').classList.remove('hidden');
+                }, 400);
+
+            } else {
+                // Gentle Error feedback
+                playSound('error');
+                const slots = document.getElementById('slots-container');
+                slots.classList.add('shake');
+                speakText("Try again!", 0.9);
+
+                setTimeout(() => {
+                    slots.classList.remove('shake');
+                    clearInputs();
+                }, 650);
+            }
+        }
+
+        function continueAfterWin() {
+            document.getElementById('win-modal').classList.add('hidden');
+            nextWord();
+        }
+
+        function nextWord() {
+            if (currentIndex < activeWordList.length - 1) {
+                currentIndex++;
+            } else {
+                currentIndex = 0;
+            }
+            loadWord();
+        }
+
+        function prevWord() {
+            if (currentIndex > 0) {
+                currentIndex--;
+            } else {
+                currentIndex = activeWordList.length - 1;
+            }
+            loadWord();
+        }
+
+        /* ----------------------------------------------------
+           6. WORD LIST GRID & SEARCH / FILTERS
+           ---------------------------------------------------- */
+        function showWordGrid() {
+            playSound('pop');
+            renderWordGrid();
+            document.getElementById('grid-modal').classList.remove('hidden');
+            document.getElementById('grid-modal').classList.add('flex');
+        }
+
+        function hideWordGrid() {
+            playSound('pop');
+            document.getElementById('grid-modal').classList.add('hidden');
+            document.getElementById('grid-modal').classList.remove('flex');
+        }
+
+        function renderWordGrid() {
+            const container = document.getElementById('word-list-grid');
+            container.innerHTML = '';
+
+            activeWordList.forEach((item, idx) => {
+                const card = document.createElement('div');
+                const isCurrent = idx === currentIndex;
+
+                card.className = `p-3 rounded-2xl flex flex-col items-center justify-center cursor-pointer border-2 transition ${
+                    isCurrent ? 'bg-amber-100 border-amber-500 scale-105 shadow-md' : 'bg-gray-50 border-gray-200 hover:bg-amber-50'
+                }`;
+                card.innerHTML = `
+                    <span class="text-3xl">${item.emoji}</span>
+                    <span class="font-black text-lg text-gray-800 uppercase mt-1">${item.word}</span>
+                    <span class="text-xs text-teal-600 font-bold">#${item.id}</span>
+                `;
+                card.onclick = () => {
+                    currentIndex = idx;
+                    hideWordGrid();
+                    loadWord();
+                };
+
+                container.appendChild(card);
+            });
+        }
+
+        function setFilter(category) {
+            playSound('pop');
+            if (category === 'easy') {
+                activeWordList = WORDS_DATA.filter(w => w.word.length <= 3);
+                document.getElementById('current-filter-tag').textContent = 'Easy (2-3)';
+            } else if (category === 'medium') {
+                activeWordList = WORDS_DATA.filter(w => w.word.length === 4);
+                document.getElementById('current-filter-tag').textContent = 'Medium (4)';
+            } else if (category === 'hard') {
+                activeWordList = WORDS_DATA.filter(w => w.word.length >= 5);
+                document.getElementById('current-filter-tag').textContent = 'Advanced (5+)';
+            } else {
+                activeWordList = [...WORDS_DATA];
+                document.getElementById('current-filter-tag').textContent = 'All (1-96)';
+            }
+
+            currentIndex = 0;
+            renderWordGrid();
+            loadWord();
+        }
+
+        /* ----------------------------------------------------
+           7. PURE HTML5 CANVAS CONFETTI (No external libraries)
+           ---------------------------------------------------- */
+        function triggerCanvasConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const particleCount = 70;
+            const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#A29BFE', '#74B9FF'];
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 14,
+                    vy: (Math.random() - 0.8) * 14,
+                    size: Math.random() * 10 + 6,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rotation: Math.random() * 360,
+                    rSpeed: (Math.random() - 0.5) * 10
+                });
+            }
+
+            let animationFrame;
+            const startTime = Date.now();
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let alive = false;
+
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.3; // Gravity
+                    p.rotation += p.rSpeed;
+
+                    if (p.y < canvas.height) alive = true;
+
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate((p.rotation * Math.PI) / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    ctx.restore();
+                });
+
+                if (alive && Date.now() - startTime < 2500) {
+                    animationFrame = requestAnimationFrame(animate);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    cancelAnimationFrame(animationFrame);
+                }
+            }
+
+            animate();
+        }
+
+        /* ----------------------------------------------------
+           8. PWA INSTALLATION & SERVICE WORKER SETUP
+           ---------------------------------------------------- */
+        function initPWA() {
+            const manifestData = {
+                name: "Kinder Spelling Bee Flashcards",
+                short_name: "SpellingBee",
+                start_url: ".",
+                display: "standalone",
+                background_color: "#E0F7FA",
+                theme_color: "#4ECDC4",
+                icons: [
+                    {
+                        src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐝</text></svg>",
+                        sizes: "192x192 512x512",
+                        type: "image/svg+xml"
+                    }
+                ]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+            document.getElementById('manifest-placeholder').setAttribute('href', URL.createObjectURL(manifestBlob));
+
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    const CACHE_NAME = 'kinder-bee-v2';
+                    self.addEventListener('install', (e) => {
+                        e.waitUntil(
+                            caches.open(CACHE_NAME).then((cache) => cache.addAll(['./']))
+                        );
+                    });
+                    self.addEventListener('fetch', (e) => {
+                        e.respondWith(
+                            caches.match(e.request).then((res) => res || fetch(e.request))
+                        );
+                    });
+                `;
+                const swBlob = new Blob([swCode], { type: 'application/javascript' });
+                navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
+            }
+        }
+
+        window.onload = function() {
+            initPWA();
+            loadWord();
+        };
+    </script>
+</body>
+</html>
