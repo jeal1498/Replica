@@ -2,7 +2,7 @@ name: Deploy Princess ABC to GitHub Pages
 on:
   push:
     branches: [main]
-    paths: ['princess-abc/**', '.github/workflows/deploy-pages.yml']
+    paths: ['princess-abc/**', 'kinder-bee/**', '.github/workflows/deploy-pages.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -27,6 +27,7 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+      - run: mkdir -p dist/kinder-bee && cp ../kinder-bee/index.html dist/kinder-bee/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: princess-abc/dist

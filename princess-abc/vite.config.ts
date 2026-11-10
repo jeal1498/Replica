@@ -32,6 +32,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,ico,webmanifest,json,mp3,ogg,wav,webp}'],
         cleanupOutdatedCaches: true,
         navigateFallback: 'index.html',
+        navigateFallbackDenylist: [/kinder-bee/],
         runtimeCaching: [
           {
             urlPattern: ({ url }) => /\.(mp3|ogg|wav)$/.test(url.pathname),

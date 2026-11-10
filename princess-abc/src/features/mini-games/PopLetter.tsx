@@ -64,7 +64,7 @@ export function PopLetter({ letters, pool, onAttempt, onFinish }: GameProps) {
         {bubbles.map((b) => !popped.includes(b.id) && (
           <button key={`${r.round}-${b.id}`} aria-label={`Bubble ${b.letter}`} onClick={() => void tap(b)}
             className={`bubble-float absolute flex items-center justify-center rounded-full border-4 border-white font-display font-extrabold text-ink shadow-[inset_-8px_-8px_0_rgba(255,255,255,.35),0_6px_0_rgba(91,47,107,.2)] ${shake === b.id ? 'wiggle' : ''}`}
-            style={{ left: `calc(${b.x}% - ${b.size / 2}px)`, top: `calc(${b.y}% - ${b.size / 2}px)`, width: b.size, height: b.size, background: b.color, fontSize: b.size * 0.55,
+            style={{ left: `calc(${b.x}% - ${b.size / 32}rem)`, top: `calc(${b.y}% - ${b.size / 32}rem)`, width: `${b.size / 16}rem`, height: `${b.size / 16}rem`, background: b.color, fontSize: `${(b.size * 0.55) / 16}rem`,
               ['--dx' as string]: `${b.dx}px`, ['--dy' as string]: `${b.dy}px`, ['--dur' as string]: `${b.dur}s` }}>
             {b.letter}
           </button>
