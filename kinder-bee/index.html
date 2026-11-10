@@ -365,31 +365,31 @@
            3. PHONETIC LETTER MAPPER (Maps Speech Words to Single English Letters)
            ---------------------------------------------------- */
         const SPOKEN_LETTER_MAP = {
-            "a": "A", "ay": "A", "hay": "A",
-            "b": "B", "be": "B", "bee": "B", "bi": "B",
+            "a": "A", "ay": "A", "hay": "A", "eh": "A", "okay": "A",
+            "b": "B", "be": "B", "bee": "B", "bi": "B", "bea": "B", "pea": "B",
             "c": "C", "see": "C", "sea": "C", "si": "C",
-            "d": "D", "dee": "D", "di": "D",
-            "e": "E", "ee": "E",
+            "d": "D", "dee": "D", "di": "D", "the": "D",
+            "e": "E", "ee": "E", "he": "E",
             "f": "F", "ef": "F", "eff": "F",
-            "g": "G", "jee": "G", "ji": "G",
+            "g": "G", "jee": "G", "ji": "G", "gee": "G",
             "h": "H", "aitch": "H", "h8": "H",
             "i": "I", "eye": "I", "ai": "I",
             "j": "J", "jay": "J",
-            "k": "K", "kay": "K",
+            "k": "K", "kay": "K", "okay": "K", "cake": "K",
             "l": "L", "el": "L", "ell": "L",
             "m": "M", "em": "M",
             "n": "N", "en": "N", "and": "N",
-            "o": "O", "oh": "O", "ow": "O",
+            "o": "O", "oh": "O", "ow": "O", "owe": "O", "zero": "O",
             "p": "P", "pee": "P", "pi": "P",
             "q": "Q", "cue": "Q", "queue": "Q",
             "r": "R", "are": "R", "our": "R", "ar": "R",
-            "s": "S", "es": "S", "ess": "S",
+            "s": "S", "es": "S", "ess": "S", "yes": "S",
             "t": "T", "tea": "T", "tee": "T", "ti": "T",
             "u": "U", "you": "U", "yew": "U",
             "v": "V", "vee": "V", "vi": "V",
             "w": "W", "double u": "W", "doubleyou": "W",
             "x": "X", "ex": "X", "ecs": "X",
-            "y": "Y", "why": "Y", "wai": "Y",
+            "y": "Y", "why": "Y", "wai": "Y", "wye": "Y",
             "z": "Z", "zed": "Z", "zee": "Z"
         };
 
@@ -478,6 +478,17 @@
             rec.continuous = true;
             rec.interimResults = true;
             rec.lang = 'en-US';
+            rec.maxAlternatives = 5;
+            // Prefer on-device recognition (works offline when the English language pack is installed)
+            if ('processLocally' in rec) { try { rec.processLocally = true; } catch(e) {} }
+            try {
+                const G = window.SpeechGrammarList || window.webkitSpeechGrammarList;
+                if (G) {
+                    const g = new G();
+                    g.addFromString('#JSGF V1.0; grammar letters; public <l> = a | b | c | d | e | f | g | h | i | j | k | l | m | n | o | p | q | r | s | t | u | v | w | x | y | z ;', 1);
+                    rec.grammars = g;
+                }
+            } catch(e) {}
 
             rec.onstart = function() {
                 isListening = true;
@@ -488,8 +499,11 @@
 
             rec.onresult = function(event) {
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    const transcript = event.results[i][0].transcript.toLowerCase().trim();
-                    processSpokenText(transcript);
+                    const res = event.results[i];
+                    if (!res.isFinal) continue; // ignore interim -> avoids duplicated letters
+                    const alts = [];
+                    for (let j = 0; j < res.length; j++) alts.push(res[j].transcript.toLowerCase().trim());
+                    processSpokenAlternatives(alts);
                 }
             };
 
@@ -499,6 +513,10 @@
                     statusElem.textContent = "⚠️ Mic permission denied. Please allow microphone access in browser settings.";
                     statusElem.className = "h-auto min-h-[24px] text-sm sm:text-base font-bold text-rose-600 text-center px-4";
                     stopVoiceRecognition();
+                } else if (event.error === 'language-not-supported' && 'processLocally' in rec) {
+                    // On-device pack not installed: fall back to online recognition
+                    rec.processLocally = false;
+                    statusElem.textContent = "🌐 Using online recognition.";
                 } else if (event.error === 'no-speech') {
                     statusElem.textContent = "🗣️ Still listening... Say a letter!";
                 }
@@ -569,6 +587,25 @@
                 icon.textContent = "🎙️";
                 text.textContent = "TAP TO SPELL BY VOICE";
             }
+        }
+
+        function toLetter(token) {
+            const clean = token.replace(/[^a-z]/g, '');
+            if (!clean) return null;
+            return SPOKEN_LETTER_MAP[clean] || (clean.length === 1 ? clean.toUpperCase() : null);
+        }
+
+        // Look through all alternatives; for a single utterance prefer the letter the child needs next
+        function processSpokenAlternatives(alts) {
+            const item = activeWordList[currentIndex];
+            const expected = item && userInputs.length < item.word.length ? item.word[userInputs.length].toUpperCase() : null;
+            const single = alts.map(a => a.split(/\s+/).filter(Boolean)).filter(t => t.length === 1).map(t => toLetter(t[0]));
+            if (single.length && expected && single.includes(expected)) {
+                document.getElementById('voice-status').textContent = `Heard letter: "${expected}"!`;
+                handleInputLetter(expected);
+                return;
+            }
+            processSpokenText(alts[0]);
         }
 
         function processSpokenText(phrase) {
