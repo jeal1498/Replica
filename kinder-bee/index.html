@@ -360,6 +360,34 @@
         let audioCtx = null;
         let recognition = null;
         let isListening = false;
+        let completed = new Set();
+        let currentFilter = 'all';
+
+        const SAVE_KEY = 'kinderBeeProgress.v1';
+        function saveProgress() {
+            try {
+                const item = activeWordList[currentIndex];
+                localStorage.setItem(SAVE_KEY, JSON.stringify({
+                    wordId: item ? item.id : 1, score, hint: hintModeActive,
+                    filter: currentFilter, completed: [...completed]
+                }));
+            } catch(e) {}
+        }
+        function restoreProgress() {
+            try {
+                const d = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
+                if (!d) return;
+                score = d.score || 0;
+                hintModeActive = d.hint !== false;
+                completed = new Set(d.completed || []);
+                currentFilter = d.filter || 'all';
+                applyFilter(currentFilter);
+                const idx = activeWordList.findIndex(w => w.id === d.wordId);
+                currentIndex = idx >= 0 ? idx : 0;
+                document.getElementById('star-count').textContent = score;
+                document.getElementById('hint-btn-label').textContent = hintModeActive ? 'Guide: ON' : 'Guide: OFF';
+            } catch(e) {}
+        }
 
         /* ----------------------------------------------------
            3. PHONETIC LETTER MAPPER (Maps Speech Words to Single English Letters)
@@ -636,6 +664,7 @@
             if (!currentItem) return;
 
             userInputs = [];
+            saveProgress();
 
             // Update UI Top Headers
             document.getElementById('word-emoji').textContent = currentItem.emoji;
@@ -760,6 +789,7 @@
             hintModeActive = !hintModeActive;
             const label = document.getElementById('hint-btn-label');
             label.textContent = hintModeActive ? 'Guide: ON' : 'Guide: OFF';
+            saveProgress();
             renderSlots();
         }
 
@@ -773,6 +803,8 @@
                 stopVoiceRecognition();
 
                 score += 10;
+                completed.add(currentItem.id);
+                saveProgress();
                 document.getElementById('star-count').textContent = score;
 
                 triggerCanvasConfetti();
@@ -850,7 +882,7 @@
                 card.innerHTML = `
                     <span class="text-3xl">${item.emoji}</span>
                     <span class="font-black text-lg text-gray-800 uppercase mt-1">${item.word}</span>
-                    <span class="text-xs text-teal-600 font-bold">#${item.id}</span>
+                    <span class="text-xs text-teal-600 font-bold">#${item.id} ${completed.has(item.id) ? '✅' : ''}</span>
                 `;
                 card.onclick = () => {
                     currentIndex = idx;
@@ -862,22 +894,17 @@
             });
         }
 
+        function applyFilter(category) {
+            currentFilter = category;
+            if (category === 'easy') activeWordList = WORDS_DATA.filter(w => w.word.length <= 3);
+            else if (category === 'medium') activeWordList = WORDS_DATA.filter(w => w.word.length === 4);
+            else if (category === 'hard') activeWordList = WORDS_DATA.filter(w => w.word.length >= 5);
+            else { currentFilter = 'all'; activeWordList = [...WORDS_DATA]; }
+        }
+
         function setFilter(category) {
             playSound('pop');
-            if (category === 'easy') {
-                activeWordList = WORDS_DATA.filter(w => w.word.length <= 3);
-                document.getElementById('current-filter-tag').textContent = 'Easy (2-3)';
-            } else if (category === 'medium') {
-                activeWordList = WORDS_DATA.filter(w => w.word.length === 4);
-                document.getElementById('current-filter-tag').textContent = 'Medium (4)';
-            } else if (category === 'hard') {
-                activeWordList = WORDS_DATA.filter(w => w.word.length >= 5);
-                document.getElementById('current-filter-tag').textContent = 'Advanced (5+)';
-            } else {
-                activeWordList = [...WORDS_DATA];
-                document.getElementById('current-filter-tag').textContent = 'All (1-96)';
-            }
-
+            applyFilter(category);
             currentIndex = 0;
             renderWordGrid();
             loadWord();
@@ -986,6 +1013,7 @@
 
         window.onload = function() {
             initPWA();
+            restoreProgress();
             loadWord();
         };
     </script>
