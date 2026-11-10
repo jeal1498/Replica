@@ -6,6 +6,7 @@ import { initPWA } from './app/pwa';
 import './styles/index.css';
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode><GameProvider><App /></GameProvider></StrictMode>,
+  <StrictMode><GameProvider><App /></GameProvider>
+    <div className="rotate-hint" role="status"><span aria-hidden>📱</span>Turn your device upright to play!</div></StrictMode>,
 );
 initPWA();

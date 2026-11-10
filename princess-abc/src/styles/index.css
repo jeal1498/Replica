@@ -3,7 +3,14 @@
 @tailwind utilities;
 
 :root { --safe-b: env(safe-area-inset-bottom, 0px); --safe-t: env(safe-area-inset-top, 0px); }
-html, body, #root { height: 100%; }
+/* Escala fluida: 1rem = 16px en un teléfono de 390x844; crece en tablets/escritorio según ancho Y alto */
+html { font-size: clamp(12px, min(4.1vw, 1.9vh), 28px); font-size: clamp(12px, min(4.1vw, 1.9dvh), 28px); }
+html, body, #root { height: 100%; height: 100dvh; }
+.rotate-hint { display: none; }
+@media (orientation: landscape) and (max-height: 480px) {
+  .rotate-hint { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: #ffe0ee; color: #4a2c5e; font-weight: 800; font-size: 28px; text-align: center; padding: 24px; }
+  .rotate-hint span { font-size: 64px; animation: wiggle 1.2s ease-in-out infinite; }
+}
 body {
   margin: 0; overscroll-behavior: none; touch-action: manipulation; user-select: none; -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent; font-family: 'Baloo 2', 'Trebuchet MS', 'Comic Sans MS', ui-rounded, system-ui, sans-serif;
